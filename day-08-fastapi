@@ -1,0 +1,26 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI(title="Day 8 - AI Summarizer API")
+
+class TextInput(BaseModel):
+    text: str
+
+@app.get("/")
+def home():
+    return {"message": "Day 8 - AI Engineer Daily Challenge Running!"}
+
+@app.post("/summarize")
+def summarize(data: TextInput):
+    # Simple AI logic - first 2 lines as summary
+    text = data.text
+    words = text.split()
+    summary = " ".join(words[:30]) + "..."
+    
+    return {
+        "original_length": len(words),
+        "summary": summary,
+        "model": "Day-8-Baseline"
+    }
+
+# Run with: uvicorn main:app --reload

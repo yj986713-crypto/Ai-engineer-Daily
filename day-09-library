@@ -1,0 +1,21 @@
+import subprocess
+import os
+
+GITHUB_URL = "https://github.com/YOUR_USERNAME/REPO_NAME.git"
+COMMIT_MSG = "Day 9 complete"
+BRANCH = "main"
+
+def run(cmd):
+    subprocess.run(cmd, shell=True)
+
+if not os.path.exists(".git"):
+    run("git init")
+
+run("git add .")
+run(f'git commit -m "{COMMIT_MSG}"')
+run(f"git branch -M {BRANCH}")
+run("git remote remove origin")
+run(f"git remote add origin {GITHUB_URL}")
+run(f"git push -u origin {BRANCH}")
+
+print("Push Done!")

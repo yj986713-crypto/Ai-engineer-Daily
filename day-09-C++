@@ -1,0 +1,84 @@
+#include <iostream>
+#include <vector>
+#include <stdexcept>
+#include <iomanip>
+
+// Define shorthand for a 2D matrix
+using Matrix = std::vector<std::vector<double>>;
+
+// Function to multiply two matrices (Simulating a Neural Network Layer Forward Pass)
+Matrix multiplyMatrices(const Matrix& A, const Matrix& B) {
+    // Get dimensions of Matrix A
+    int rowsA = A.size();
+    int colsA = A[0].size();
+
+    // Get dimensions of Matrix B
+    int rowsB = B.size();
+    int colsB = B[0].size();
+
+    // Standard AI check: Columns of A must equal Rows of B to perform dot product
+    if (colsA != rowsB) {
+        throw std::invalid_argument("Matrix dimension mismatch! Cannot multiply.");
+    }
+
+    // Initialize the output matrix with zeros (Dimensions: rowsA x colsB)
+    Matrix result(rowsA, std::vector<double>(colsB, 0.0));
+
+    // Perform dot product operations (Row x Column)
+    for (int i = 0; i < rowsA; ++i) {
+        for (int j = 0; j < colsB; ++j) {
+            for (int k = 0; k < colsA; ++k) {
+                // Accumulate multiplication results
+                result[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
+
+    return result;
+}
+
+// Helper function to cleanly display matrices in the console
+void printMatrix(const Matrix& matrix) {
+    for (const auto& row : matrix) {
+        for (double val : row) {
+            std::cout << std::setw(8) << std::fixed << std::setprecision(2) << val << " ";
+        }
+        std::cout << "\n";
+    }
+}
+
+int main() {
+    std::cout << "🚀 Initializing C++ AI Matrix Engine...\n\n";
+
+    // Matrix A: Simulating 2 input data instances with 3 features each
+    Matrix inputFeatures = {
+        {1.0, 2.0, 3.0},
+        {4.0, 5.0, 6.0}
+    };
+
+    // Matrix B: Simulating Neural Network weights for 3 inputs transforming to 2 hidden neurons
+    Matrix layerWeights = {
+        {0.5, 0.8},
+        {0.2, 0.1},
+        {0.9, 0.4}
+    };
+
+    std::cout << "Input Features (Matrix A):\n";
+    printMatrix(inputFeatures);
+    std::cout << "\nLayer Weights (Matrix B):\n";
+    printMatrix(layerWeights);
+
+    try {
+        // Execute the neural layer computation
+        Matrix outputLayer = multiplyMatrices(inputFeatures, layerWeights);
+
+        // Display final processed results
+        std::cout << "\n✅ Processed Output Layer (Result Matrix):\n";
+        printMatrix(outputLayer);
+
+    } catch (const std::exception& e) {
+        std::cerr << "❌ Execution Error: " << e.what() << "\n";
+    }
+
+    return 0;
+}

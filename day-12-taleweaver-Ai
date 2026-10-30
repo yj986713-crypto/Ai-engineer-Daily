@@ -1,0 +1,35 @@
+import google.generativeai as genai
+import streamlit as st
+
+# Configure API key from Google AI Studio
+genai.configure(api_key="YOUR_API_KEY_HERE")
+
+# App title and description
+st.title("NarrativeForge - AI Story Generator")
+st.write("Built after Google Cloud Intro to GenAI | Concepts: LLM + Prompt Engineering")
+
+# User input for story topic
+topic = st.text_input("Enter a topic, e.g., 'A robot in Mumbai'")
+
+if st.button("Generate Story"):
+    if topic:
+        # Initialize Gemini model (LLM)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        # Prompt engineering: Giving clear tasks to the LLM
+        # Task 2 is for Diffusion Model understanding from Google course
+        prompt = f"""
+        Topic: {topic}
+        Task 1: Write a creative story of 100 words on this topic.
+        Task 2: Create a detailed image generation prompt for this story,
+        suitable for a Diffusion Model like Imagen.
+        """
+        
+        # Generate content using LLM
+        response = model.generate_content(prompt)
+        
+        # Display result
+        st.success(response.text)
+        st.balloons()
+    else:
+        st.warning("Please enter a topic first!")

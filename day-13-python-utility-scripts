@@ -1,0 +1,31 @@
+import time
+import winsound  # Use print("\a") for Mac/Linux if winsound isn't available
+
+def countdown_timer():
+    print("--- Python Countdown Timer ---")
+    try:
+        minutes = int(input("Enter minutes: "))
+        seconds = int(input("Enter seconds: "))
+        total_seconds = (minutes * 60) + seconds
+    except ValueError:
+        print("Please enter valid integers.")
+        return
+
+    print(f"\nTimer set for {minutes:02d}:{seconds:02d}. Starting countdown...")
+    time.sleep(1)
+
+    while total_seconds > 0:
+        mins, secs = divmod(total_seconds, 60)
+        # Overwrite the current line using carriage return (\r)
+        print(f"Time Remaining: {mins:02d}:{secs:02d}", end="\r")
+        time.sleep(1)
+        total_seconds -= 1
+
+    print("Time Remaining: 00:00")
+    print("\n⏰ TIME'S UP! ⏰")
+    
+    # Play a beep sound (Frequency: 2500Hz, Duration: 1000ms)
+    winsound.Beep(2500, 1000)
+
+if __name__ == "__main__":
+    countdown_timer()

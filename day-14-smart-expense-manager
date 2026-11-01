@@ -1,0 +1,94 @@
+import json
+import os
+from datetime import datetime
+
+DATA_FILE = "expenses.json"
+
+def load_expenses():
+    """Loads expenses from the JSON file. Creates an empty file if it doesn't exist."""
+    if not os.path.exists(DATA_FILE):
+        return []
+    try:
+        with open(DATA_FILE, "r") as file:
+            return json.load(file)
+    except json.JSONDecodeError:
+        return []
+
+def save_expenses(expenses):
+    """Saves the expenses list to the JSON file."""
+    with open(DATA_FILE, "w") as file:
+        json.dump(expenses, file, indent=4)
+
+def add_expense(expenses):
+    """Prompts user for input and adds a new expense entry."""
+    print("\n--- Add New Expense ---")
+    try:
+        amount = float(input("Enter amount spent: ₹"))
+        if amount <= 0:
+            print("Amount must be greater than zero.")
+            return
+    except ValueError:
+        print("Invalid amount. Please enter a valid number.")
+        return
+
+    category = input("Enter category (e.g., Food, Travel, Rent, Entertainment): ").strip().capitalize()
+    if not category:
+        category = "Other"
+
+    description = input("Enter brief description (optional): ").strip()
+    date_str = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    new_item = {
+        "date": date_str,
+        "amount": amount,
+        "category": category,
+        "description": description
+    }
+
+    expenses.append(new_item)
+    save_expenses(expenses)
+    print(f"✅ Success! Added ₹{amount:.2f} to '{category}'.")
+
+def view_expenses(expenses):
+    """Displays all logged expenses and calculates the final total."""
+    print("\n--- Expense History ---")
+    if not expenses:
+        print("No expenses recorded yet.")
+        return
+
+    total = 0
+    print(f"{'Date':<17} | {'Category':<15} | {'Amount':<10} | {'Description'}")
+    print("-" * 65)
+    
+    for item in expenses:
+        print(f"{item['date']:<17} | {item['category']:<15} | ₹{item['amount']:<9.2f} | {item['description']}")
+        total += item['amount']
+        
+    print("-" * 65)
+    print(f"💰 GRAND TOTAL SPENT: ₹{total:.2f}")
+
+def main():
+    expenses = load_expenses()
+    
+    while True:
+        print("\n=============================")
+        print("   PERSONAL EXPENSE TRACKER  ")
+        print("=============================")
+        print("1. Add an Expense")
+        print("2. View Expense Summary")
+        print("3. Exit")
+        
+        choice = input("Choose an option (1-3): ").strip()
+        
+        if choice == "1":
+            add_expense(expenses)
+        elif choice == "2":
+            view_expenses(expenses)
+        elif choice == "3":
+            print("\nGoodbye! Stay on budget! 💸")
+            break
+        else:
+            print("Invalid selection. Please type 1, 2, or 3.")
+
+if __name__ == "__main__":
+    main()

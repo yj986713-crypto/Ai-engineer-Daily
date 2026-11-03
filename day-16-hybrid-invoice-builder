@@ -1,0 +1,127 @@
+import os
+import webbrowser
+
+def generate_invoice():
+    print("--- 🧾 Multi-Language Smart Invoice Generator 🧾 ---")
+    
+    # Get basic inputs
+    client_name = input("Enter Client/Customer Name: ").strip() or "Valued Customer"
+    invoice_num = input("Enter Invoice Number (e.g., INV-001): ").strip() or "INV-1001"
+    
+    items = []
+    while True:
+        item_name = input("\nEnter item/service name (or type 'done' to finish): ").strip()
+        if item_name.lower() == 'done' or not item_name:
+            break
+        try:
+            quantity = int(input(f"Enter quantity for '{item_name}': "))
+            price = float(input(f"Enter unit price for '{item_name}': ₹"))
+            total_item_cost = quantity * price
+            items.append({"name": item_name, "qty": quantity, "price": price, "total": total_item_cost})
+        except ValueError:
+            print("❌ Invalid number. Please re-enter this item.")
+
+    if not items:
+        print("No items added. Exiting.")
+        return
+
+    # Calculate Totals via Python
+    subtotal = sum(item["total"] for item in items)
+    tax = subtotal * 0.18  # 18% GST/Tax calculation
+    grand_total = subtotal + tax
+
+    # Multi-Language Mix: Generating the structured HTML & styled CSS code string
+    html_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice {invoice_num}</title>
+    <!-- Internal CSS Language Mix for beautiful presentation -->
+    <style>
+        body {{ font-family: 'Segoe UI', Arial, sans-serif; color: #333; margin: 0; padding: 40px; background-color: #f9f9f9; }}
+        .invoice-box {{ max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; background: #fff; box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); border-radius: 8px; }}
+        .header {{ display: flex; justify-content: space-between; border-bottom: 2px solid #5cb85c; padding-bottom: 2px; margin-bottom: 20px; }}
+        .company-title {{ color: #5cb85c; font-size: 28px; font-weight: bold; }}
+        .details-table {{ width: 100%; margin-bottom: 30px; line-height: 20px; }}
+        .items-table {{ width: 100%; border-collapse: collapse; margin-top: 10px; }}
+        .items-table th {{ background-color: #5cb85c; color: white; text-align: left; padding: 10px; }}
+        .items-table td {{ padding: 10px; border-bottom: 1px solid #ddd; }}
+        .total-section {{ text-align: right; margin-top: 20px; font-size: 16px; line-height: 24px; }}
+        .grand-total {{ font-size: 20px; font-weight: bold; color: #5cb85c; }}
+    </style>
+</head>
+<body>
+    <div class="invoice-box">
+        <div class="header">
+            <div>
+                <div class="company-title">INVOICE</div>
+                <p>Invoice #<strong>{invoice_num}</strong></p>
+            </div>
+            <div style="text-align: right;">
+                <h3>My Coding Studio</h3>
+                <p>Thane, Maharashtra, India</p>
+            </div>
+        </div>
+        
+        <table class="details-table">
+            <tr>
+                <td><strong>Billed To:</strong><br>{client_name}</td>
+                <td style="text-align: right;"><strong>Date:</strong><br>Generated Today</td>
+            </tr>
+        </table>
+
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Item Description</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+    """
+
+    # Dynamically inject the raw data rows into the HTML template
+    for item in items:
+        html_content += f"""
+                <tr>
+                    <td>{item['name']}</td>
+                    <td>{item['qty']}</td>
+                    <td>₹{item['price']:.2f}</td>
+                    <td>₹{item['total']:.2f}</td>
+                </tr>
+        """
+
+    # Wrap up the web structure string 
+    html_content += f"""
+            </tbody>
+        </table>
+
+        <div class="total-section">
+            <p>Subtotal: ₹{subtotal:.2f}</p>
+            <p>GST / Tax (18%): ₹{tax:.2f}</p>
+            <hr style="border: 0; border-top: 1px solid #eee;">
+            <p class="grand-total">Grand Total: ₹{grand_total:.2f}</p>
+        </div>
+    </div>
+</body>
+</html>
+    """
+
+    # Save the output to a live .html file
+    output_filename = f"invoice_{invoice_num}.html"
+    with open(output_filename, "w", encoding="utf-8") as file:
+        file.write(html_content)
+
+    print(f"\n🚀 Success! Web invoice generated: {output_filename}")
+    
+    # Automatically launch your browser to see the finished visually styled result
+    try:
+        webbrowser.open('file://' + os.path.realpath(output_filename))
+    except Exception:
+        print("Open the HTML file in your web browser to view your document template.")
+
+if __name__ == "__main__":
+    generate_invoice()
+                  

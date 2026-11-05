@@ -1,0 +1,120 @@
+import http.server
+import socketserver
+import webbrowser
+
+PORT = 8080
+
+# Multi-Language Mix: Creating the interactive frontend interface
+html_workspace = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Markdown Workspace</title>
+    <!-- CSS Language for a modern, side-by-side split screen layout -->
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        header {
+            background-color: #252526;
+            padding: 10px 20px;
+            border-bottom: 1px solid #3c3c3c;
+        }
+        h2 { margin: 0; color: #00adb5; font-size: 20px; }
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        textarea, .preview {
+            width: 50%;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            border: none;
+            overflow-y: auto;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        textarea {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Courier New', monospace;
+            resize: none;
+            outline: none;
+            border-right: 1px solid #3c3c3c;
+        }
+        .preview {
+            background-color: #252526;
+            color: #e0e0e0;
+        }
+        /* Markdown internal styling rules */
+        .preview h1 { color: #00adb5; border-bottom: 1px solid #3c3c3c; padding-bottom: 5px; }
+        .preview h2 { color: #00adb5; margin-top: 20px; }
+        .preview code { background-color: #3a3a3a; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+        .preview ul { padding-left: 20px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h2>📝 Live Markdown Workspace Editor</h2>
+    </header>
+
+    <div class="container">
+        <!-- Editor Input Panel -->
+        <textarea id="markdownInput" oninput="updatePreview()" placeholder="Type your text formatting here...\\n\\n# Heading 1\\n## Heading 2\\nUse **bold text** or *italics*.\\n\\nCreate simple bullet points:\\n- Step one\\n- Step two\\n\\nWrite `code snippets` easily!"></textarea>
+        
+        <!-- Live Visual Output Render Panel -->
+        <div class="preview" id="previewOutput"></div>
+    </div>
+
+    <!-- JavaScript Language Mix to parse markdown rules on-the-fly -->
+    <script>
+        function updatePreview() {
+            const rawText = document.getElementById('markdownInput').value;
+            let htmlRender = rawText
+                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") // Sanitize text
+                .replace(/^# (.*?)$/gm, '<h1>$1</h1>')                            // # Headers
+                .replace(/^## (.*?)$/gm, '<h2>$1</h2>')                          // ## Subheadings
+                .replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>')                 // **Bold**
+                .replace(/\\*(.*?)\\*/g, '<em>$1</em>')                            // *Italics*
+                .replace(/`(.*?)`/g, '<code>$1</code>')                          // `Inline Code`
+                .replace(/^- (.*?)$/gm, '<ul><li>$1</li></ul>')                  // Lists
+                .replace(/<\\/ul>\\s*<ul>/g, '')                                    // Clean list spacing
+                .replace(/\\n/g, '<br>');                                         // Line breaks
+
+            document.getElementById('previewOutput').innerHTML = htmlRender;
+        }
+        // Initialize sample workspace view
+        updatePreview();
+    </script>
+</body>
+</html>
+"""
+
+# Output index web setup
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html_workspace)
+
+class QuietHandler(http.server.SimpleHTTPRequestHandler):
+    def log_message(self, format, *args):
+        pass # Silence active console spam logs
+
+print(f"🚀 Initializing Python Web Engine on http://localhost:{PORT}")
+webbrowser.open(f"http://localhost:{PORT}")
+
+with socketserver.TCPServer(("", PORT), QuietHandler) as httpd:
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("\nShutting down the live web server engine environment safely.")
+          

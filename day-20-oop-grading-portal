@@ -1,0 +1,118 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <iomanip>
+
+using namespace std;
+
+// Structure to store individual subject details
+struct Subject {
+    string name;
+    double marks;
+};
+
+// Class to manage Student Profile and Grade calculations
+class Student {
+private:
+    string studentName;
+    int rollNumber;
+    vector<Subject> subjects;
+
+public:
+    // Constructor
+    Student(string name, int roll) {
+        studentName = name;
+        rollNumber = roll;
+    }
+
+    // Method to add a subject entry
+    void addSubject(string subName, double score) {
+        Subject newSub = {subName, score};
+        subjects.push_back(newSub);
+    }
+
+    // Calculate overall percentage
+    double calculatePercentage() {
+        if (subjects.empty()) return 0.0;
+        double totalMarks = 0;
+        for (const auto& sub : subjects) {
+            totalMarks += sub.marks;
+        }
+        return totalMarks / subjects.size();
+    }
+
+    // Determine final letter grade based on percentage
+    char getLetterGrade(double percentage) {
+        if (percentage >= 90) return 'A';
+        if (percentage >= 80) return 'B';
+        if (percentage >= 70) return 'C';
+        if (percentage >= 60) return 'D';
+        return 'F';
+    }
+
+    // Display formatted Report Card matrix
+    void displayReportCard() {
+        cout << "\n=============================================\n";
+        cout << "             OFFICIAL REPORT CARD            \n";
+        cout << "=============================================\n";
+        cout << "Student Name : " << studentName << "\n";
+        cout << "Roll Number  : " << rollNumber << "\n";
+        cout << "---------------------------------------------\n";
+        cout << left << setw(25) << "Subject" << " | " << "Marks Obtained" << "\n";
+        cout << "---------------------------------------------\n";
+
+        for (const auto& sub : subjects) {
+            cout << left << setw(25) << sub.name << " | " << fixed << setprecision(2) << sub.marks << "\n";
+        }
+
+        double finalPercentage = calculatePercentage();
+        cout << "---------------------------------------------\n";
+        cout << "Final Percentage : " << fixed << setprecision(2) << finalPercentage << "%\n";
+        cout << "Final Grade      : [" << getLetterGrade(finalPercentage) << "]\n";
+        cout << "=============================================\n";
+    }
+};
+
+int main() {
+    cout << "--- 🎓 Student Report Card Portal 🎓 ---\n\n";
+    
+    string name;
+    int roll;
+    
+    cout << "Enter Student Name: ";
+    getline(cin, name);
+    
+    cout << "Enter Roll Number: ";
+    cin >> roll;
+
+    // Create student instance
+    Student student1(name, roll);
+
+    int subjectCount;
+    cout << "How many subjects do you want to add? ";
+    cin >> subjectCount;
+
+    for (int i = 0; i < subjectCount; i++) {
+        string subName;
+        double score;
+        
+        cout << "\nEnter name for Subject " << (i + 1) << ": ";
+        cin.ignore(); // Clear input buffer
+        getline(cin, subName);
+        
+        cout << "Enter marks obtained out of 100: ";
+        cin >> score;
+        
+        if (score >= 0 && score <= 100) {
+            student1.addSubject(subName, score);
+        } else {
+            cout << "❌ Invalid marks! Please enter a value between 0 and 100.\n";
+            i--; // Repeat current iteration for valid entry
+        }
+    }
+
+    // Print final compiled dashboard metrics
+    student1.displayReportCard();
+
+    return 0;
+}

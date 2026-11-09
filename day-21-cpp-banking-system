@@ -1,0 +1,107 @@
+#include <iostream>
+#include <string>
+#include <iomanip>
+
+using namespace std;
+
+class BankAccount {
+private:
+    string accountHolder;
+    long long accountNumber;
+    double balance;
+
+public:
+    // Constructor to initialize account metrics
+    BankAccount(string name, long long accNum, double initialDeposit) {
+        accountHolder = name;
+        accountNumber = accNum;
+        balance = initialDeposit >= 0 ? initialDeposit : 0.0;
+    }
+
+    // Method to securely deposit money
+    void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            cout << "💵 Success! Deposited ₹" << fixed << setprecision(2) << amount << "\n";
+        } else {
+            cout << "❌ Invalid deposit amount.\n";
+        }
+    }
+
+    // Method to handle withdrawals with balance safety checks
+    void withdraw(double amount) {
+        if (amount <= 0) {
+            cout << "❌ Invalid withdrawal amount.\n";
+        } else if (amount > balance) {
+            cout << "❌ Transaction Failed: Insufficient funds!\n";
+        } else {
+            balance -= amount;
+            cout << "💸 Success! Withdrew ₹" << fixed << setprecision(2) << amount << "\n";
+        }
+    }
+
+    // Method to display current ledger metrics
+    void displayBalance() const {
+        cout << "\n=========================================\n";
+        cout << "            ACCOUNT SUMMARY              \n";
+        cout << "=========================================\n";
+        cout << "Account Holder : " << accountHolder << "\n";
+        cout << "Account Number : " << accountNumber << "\n";
+        cout << "Current Balance: ₹" << fixed << setprecision(2) << balance << "\n";
+        cout << "=========================================\n";
+    }
+};
+
+int main() {
+    cout << "--- 🏦 Secure Terminal Banking Portal 🏦 ---\n\n";
+
+    string name;
+    long long accNum;
+    double initialDeposit;
+
+    // Set up account profile
+    cout << "Enter Account Holder Name: ";
+    getline(cin, name);
+    cout << "Create a 6-Digit Account Number: ";
+    cin >> accNum;
+    cout << "Enter Initial Deposit Amount: ₹";
+    cin >> initialDeposit;
+
+    BankAccount myAccount(name, accNum, initialDeposit);
+
+    int choice;
+    double amount;
+
+    // Main Interactive Banking loop
+    while (true) {
+        cout << "\n--- MAIN MENU ---\n";
+        cout << "1. Deposit Money\n";
+        cout << "2. Withdraw Money\n";
+        cout << "3. Check Balance Summary\n";
+        cout << "4. Exit\n";
+        cout << "Choose an option (1-4): ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter deposit amount: ₹";
+                cin >> amount;
+                myAccount.deposit(amount);
+                break;
+            case 2:
+                cout << "Enter withdrawal amount: ₹";
+                cin >> amount;
+                myAccount.withdraw(amount);
+                break;
+            case 3:
+                myAccount.displayBalance();
+                break;
+            case 4:
+                cout << "\nThank you for banking with us. Securely logging out... 👋\n";
+                return 0;
+            default:
+                cout << "❌ Invalid choice! Please select an option from 1 to 4.\n";
+        }
+    }
+    return 0;
+}

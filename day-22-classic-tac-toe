@@ -1,0 +1,116 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+// Initialize a 3x3 board matrix layout
+vector<vector<char>> board(3, vector<char>(3, ' '));
+char current_marker;
+int current_player;
+
+void drawBoard() {
+    cout << "\n-------------\n";
+    for (int i = 0; i < 3; i++) {
+        cout << "| ";
+        for (int j = 0; j < 3; j++) {
+            cout << board[i][j] << " | ";
+        }
+        cout << "\n-------------\n";
+    }
+}
+
+bool placeMarker(int slot) {
+    // Translate standard 1-9 grid slots into matrix coordinates row/column index
+    int row = (slot - 1) / 3;
+    int col = (slot - 1) % 3;
+
+    // Check if slot workspace is already occupied
+    if (board[row][col] != 'X' && board[row][col] != 'O') {
+        board[row][col] = current_marker;
+        return true;
+    }
+    return false;
+}
+
+int checkWinner() {
+    // Row checks
+    for (int i = 0; i < 3; i++) {
+        if (board[i][0] == board[i][1] && board[i][1] == board[i][2] && board[i][0] != ' ')
+            return current_player;
+    }
+    // Column checks
+    for (int i = 0; i < 3; i++) {
+        if (board[0][i] == board[1][i] && board[1][i] == board[2][i] && board[0][i] != ' ')
+            return current_player;
+    }
+    // Diagonal checks
+    if (board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] != ' ')
+        return current_player;
+    if (board[0][2] == board[1][1] && board[1][1] == board[2][0] && board[0][2] != ' ')
+        return current_player;
+
+    return 0;
+}
+
+void swapPlayerAndMarker() {
+    if (current_marker == 'X') current_marker = 'O';
+    else current_marker = 'X';
+
+    if (current_player == 1) current_player = 2;
+    else current_player = 1;
+}
+
+void game() {
+    cout << "--- 🎮 Multi-Player Tic-Tac-Toe Arena 🎮 ---\n";
+    cout << "Player 1, choose your marker (X or O): ";
+    cin >> current_marker;
+
+    while (current_marker != 'X' && current_marker != 'O') {
+        cout << "Invalid marker! Please pick exactly 'X' or 'O': ";
+        cin >> current_marker;
+    }
+
+    current_player = 1;
+    drawBoard();
+
+    int player_won = 0;
+    int total_turns = 0;
+
+    for (int i = 0; i < 9; i++) {
+        int slot;
+        cout << "Player " << current_player << "'s turn (" << current_marker << "). Enter slot (1-9): ";
+        cin >> slot;
+
+        if (slot < 1 || slot > 9) {
+            cout << "❌ Invalid boundary slot! Choose a value between 1 and 9.\n";
+            i--;
+            continue;
+        }
+
+        if (!placeMarker(slot)) {
+            cout << "❌ That slot is already occupied! Try another one.\n";
+            i--;
+            continue;
+        }
+
+        drawBoard();
+        total_turns++;
+        player_won = checkWinner();
+
+        if (player_won != 0) {
+            cout << "🎉 Congratulations! Player " << player_won << " wins the match!\n";
+            break;
+        }
+
+        swapPlayerAndMarker();
+    }
+
+    if (player_won == 0 && total_turns == 9) {
+        cout << "🤝 It's a Tie! Well played both sides!\n";
+    }
+}
+
+int main() {
+    game();
+    return 0;
+}

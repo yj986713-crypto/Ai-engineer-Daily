@@ -1,0 +1,144 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <iomanip>
+
+using namespace std;
+
+// Class to structure single contact profiles
+class Contact {
+public:
+    string name;
+    string phone;
+    string email;
+
+    // Convert data to a single line format for text file storage
+    string serialize() const {
+        return name + "," + phone + "," + email;
+    }
+};
+
+class ContactManager {
+private:
+    vector<Contact> contacts;
+    const string filename = "contacts_database.txt";
+
+    // Load data silently from text file into memory array
+    void loadFromFile() {
+        contacts.clear();
+        ifstream file(filename);
+        if (!file.is_open()) return;
+
+        string line;
+        while (getline(file, line)) {
+            size_t pos1 = line.find(',');
+            size_t pos2 = line.find(',', pos1 + 1);
+            if (pos1 != string::npos && pos2 != string::npos) {
+                Contact c;
+                c.name = line.substr(0, pos1);
+                c.phone = line.substr(pos1 + 1, pos2 - pos1 - 1);
+                c.email = line.substr(pos2 + 1);
+                contacts.push_back(c);
+            }
+        }
+        file.close();
+    }
+
+    // Rewrite database to reflect current edits
+    void saveToFile() {
+        ofstream file(filename);
+        for (const auto& c : contacts) {
+            file << c.serialize() << "\n";
+        }
+        file.close();
+    }
+
+public:
+    ContactManager() {
+        loadFromFile();
+    }
+
+    void addContact() {
+        Contact c;
+        cout << "\n--- Add New Contact ---\n";
+        cout << "Enter Name: ";
+        cin.ignore();
+        getline(cin, c.name);
+        cout << "Enter Phone Number: ";
+        getline(cin, c.phone);
+        cout << "Enter Email Address: ";
+        getline(cin, c.email);
+
+        contacts.push_back(c);
+        saveToFile();
+        cout << "✅ Contact saved successfully!\n";
+    }
+
+    void displayAll() {
+        cout << "\n=========================================================\n";
+        cout << "                    SAVED CONTACTS                       \n";
+        cout << "=========================================================\n";
+        if (contacts.empty()) {
+            cout << "No contacts saved yet.\n";
+            return;
+        }
+
+        cout << left << setw(20) << "Name" << " | " << setw(15) << "Phone" << " | " << "Email" << "\n";
+        cout << "---------------------------------------------------------\n";
+        for (const auto& c : contacts) {
+            cout << left << setw(20) << c.name << " | " << setw(15) << c.phone << " | " << c.email << "\n";
+        }
+    }
+
+    void searchContact() {
+        cout << "\n--- Search Contacts ---\n";
+        cout << "Enter name to search: ";
+        string query;
+        cin.ignore();
+        getline(cin, query);
+
+        bool found = false;
+        for (const auto& c : contacts) {
+            if (c.name.find(query) != string::npos) {
+                if (!found) {
+                    cout << "\nMatches Found:\n";
+                    cout << left << setw(20) << "Name" << " | " << setw(15) << "Phone" << " | " << "Email" << "\n";
+                    cout << "---------------------------------------------------------\n";
+                }
+                cout << left << setw(20) << c.name << " | " << setw(15) << c.phone << " | " << c.email << "\n";
+                found = true;
+            }
+        }
+        if (!found) cout << "❌ No contacts match that name.\n";
+    }
+};
+
+int main() {
+    ContactManager cm;
+    int choice;
+
+    while (true) {
+        cout << "\n=========================" << endl;
+        cout << "   CONTACT BOOK PORTAL   " << endl;
+        cout << "=========================" << endl;
+        cout << "1. Display All Contacts" << endl;
+        cout << "2. Add New Contact" << endl;
+        cout << "3. Search Contact By Name" << endl;
+        cout << "4. Exit" << endl;
+        cout << "Choose an option (1-4): ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: cm.displayAll(); break;
+            case 2: cm.addContact(); break;
+            case 3: cm.searchContact(); break;
+            case 4: 
+                cout << "\nExiting directory workspace. Changes saved safely! 👋\n"; 
+                return 0;
+            default: 
+                cout << "❌ Invalid choice! Choose between 1 and 4.\n";
+        }
+    }
+    return 0;
+}

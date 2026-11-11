@@ -1,0 +1,138 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <iomanip>
+
+using namespace std;
+
+class Book {
+public:
+    int id;
+    string title;
+    string author;
+    bool isIssued;
+
+    Book(int bookId, string bookTitle, string bookAuthor) {
+        id = bookId;
+        title = bookTitle;
+        author = bookAuthor;
+        isIssued = false;
+    }
+};
+
+class Library {
+private:
+    vector<Book> books;
+
+public:
+    // Pre-load a few starter books
+    Library() {
+        books.push_back(Book(101, "Clean Code", "Robert C. Martin"));
+        books.push_back(Book(102, "The Pragmatic Programmer", "Andrew Hunt"));
+        books.push_back(Book(103, "C++ Primer", "Stanley B. Lippman"));
+    }
+
+    void addBook() {
+        int id;
+        string title, author;
+        cout << "\n--- Add New Book ---\n";
+        cout << "Enter Book ID (e.g., 104): ";
+        cin >> id;
+        cin.ignore();
+        cout << "Enter Book Title: ";
+        getline(cin, title);
+        cout << "Enter Author Name: ";
+        getline(cin, author);
+
+        books.push_back(Book(id, title, author));
+        cout << "✅ Book added to the library catalog!\n";
+    }
+
+    void displayBooks() {
+        cout << "\n====================================================================\n";
+        cout << "                       LIBRARY BOOK CATALOG                         \n";
+        cout << "====================================================================\n";
+        cout << left << setw(8) << "ID" << " | " 
+             << setw(28) << "Title" << " | " 
+             << setw(20) << "Author" << " | " 
+             << "Status" << "\n";
+        cout << "--------------------------------------------------------------------\n";
+
+        for (const auto& b : books) {
+            string status = b.isIssued ? "Issued ❌" : "Available ✅";
+            cout << left << setw(8) << b.id << " | " 
+                 << setw(28) << b.title << " | " 
+                 << setw(20) << b.author << " | " 
+                 << status << "\n";
+        }
+    }
+
+    void issueBook() {
+        int id;
+        cout << "\nEnter Book ID to issue: ";
+        cin >> id;
+
+        for (auto& b : books) {
+            if (b.id == id) {
+                if (b.isIssued) {
+                    cout << "❌ Sorry, '" << b.title << "' is already issued to someone else.\n";
+                } else {
+                    b.isIssued = true;
+                    cout << "📖 Success! You have borrowed '" << b.title << "'.\n";
+                }
+                return;
+            }
+        }
+        cout << "❌ Book ID not found in the catalog.\n";
+    }
+
+    void returnBook() {
+        int id;
+        cout << "\nEnter Book ID to return: ";
+        cin >> id;
+
+        for (auto& b : books) {
+            if (b.id == id) {
+                if (!b.isIssued) {
+                    cout << "⚠️ This book was not issued.\n";
+                } else {
+                    b.isIssued = false;
+                    cout << "✅ Thank you! '" << b.title << "' has been returned.\n";
+                }
+                return;
+            }
+        }
+        cout << "❌ Book ID not found in the catalog.\n";
+    }
+};
+
+int main() {
+    Library lib;
+    int choice;
+
+    while (true) {
+        cout << "\n===========================\n";
+        cout << "   LIBRARY MANAGEMENT CLI  \n";
+        cout << "===========================\n";
+        cout << "1. View All Books\n";
+        cout << "2. Add New Book\n";
+        cout << "3. Issue (Borrow) a Book\n";
+        cout << "4. Return a Book\n";
+        cout << "5. Exit\n";
+        cout << "Choose an option (1-5): ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: lib.displayBooks(); break;
+            case 2: lib.addBook(); break;
+            case 3: lib.issueBook(); break;
+            case 4: lib.returnBook(); break;
+            case 5:
+                cout << "\nClosing Library System. Happy reading! 📚\n";
+                return 0;
+            default:
+                cout << "❌ Invalid selection. Please choose between 1 and 5.\n";
+        }
+    }
+    return 0;
+}
